@@ -3,7 +3,6 @@
 require './lib/ai.rb'
 require './lib/code.rb'
 require './lib/colors.rb'
-require './lib/color_confidence.rb'
 
 # Base Player Class
 class Player
@@ -87,11 +86,12 @@ end
 # Computer Player
 class Computer < Player
   include AI
-  attr_reader :colors, :previous_guesses
+  attr_reader :previous_guesses, :possibilities, :critiques
 
   def initialize
     @previous_guesses = []
-    @colors = []
+    @critiques = []
+    @possibilities = generate_possibilities
   end
 
   def ask_for_code
@@ -99,25 +99,15 @@ class Computer < Player
   end
 
   def ask_for_guess
-    if colors.empty?
-      # Return a new guess if we have no confidence in any colors
-      return generate_random_colors
+    if @previous_guesses.empty?
+      guess = initial_guess(possibilities)
+      @previous_guesses << guess.dup
+      return color_confidence_to_color(guess)
     end
 
-    current_guess = build_guess_with_confident_colors(colors)
-    current_guess = build_guess_with_unconfident_colors(colors, current_guess)
-
-    # Fill in any remaining blanks with random guesses
-    if current_guess.any?(nil)
-      current_guess = current_guess.map do |g|
-        if g.nil?
-          current_guess[i] = COLORS.sample
-        end
-      end
-    end
-
-    @guesses << current_guess.dup
-    color_confidence_to_color(current_guess)
+    guess = build_guess(previous_guesses, @possibilities)
+    @previous_guesses << guess.dup
+    color_confidence_to_color(guess)
   end
 
   def provide_feedback(critique)
@@ -125,12 +115,8 @@ class Computer < Player
     @critiques << critique
 
     # look at the previous guess
-    previous_guess = @guesses.last
+    last_guess = @previous_guesses.last
 
-    # Once we get the critique back, we need to modify our color confidences
-    # if any are correct, increase those colors by +25
-    # if any are misplaced, increase by +10
-    
-
+    @possibilities = adjust_confidences(@possibilities, last_guess, critique)
   end
 end

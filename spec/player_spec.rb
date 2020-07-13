@@ -1,106 +1,108 @@
 require './lib/player'
 
 describe Computer do
-  describe '#generate_random_colors' do
-    it 'should generate randomized colors with an array size of 4' do
-      c = Computer.new
-      expect(c.generate_random_colors.count).to eq(4)
-    end
-
-    it 'should not have any blanks in the array' do
-      c = Computer.new
-      expect(c.generate_random_colors.none?(:blank)).to be true
-    end
+  describe AI do
   end
+#   describe '#generate_random_colors' do
+#     it 'should generate randomized colors with an array size of 4' do
+#       c = Computer.new
+#       expect(c.generate_random_colors.count).to eq(4)
+#     end
 
-  describe '#order_colors_by_confidence' do
-    it 'should correctly order the colors by their confidence level' do
-      p = Computer.new
+#     it 'should not have any blanks in the array' do
+#       c = Computer.new
+#       expect(c.generate_random_colors.none?(:blank)).to be true
+#     end
+#   end
 
-      colors = [
-        ColorConfidence.new(:black, 0, 50),
-        ColorConfidence.new(:red, 1, 25),
-        ColorConfidence.new(:purple, 0, 75)
-      ]
+#   describe '#order_colors_by_confidence' do
+#     it 'should correctly order the colors by their confidence level' do
+#       p = Computer.new
 
-      sorted_colors = [
-        ColorConfidence.new(:purple, 0, 75),
-        ColorConfidence.new(:black, 0, 50),
-        ColorConfidence.new(:red, 1, 25)
-      ]
+#       colors = [
+#         ColorConfidence.new(:black, 0, 50),
+#         ColorConfidence.new(:red, 1, 25),
+#         ColorConfidence.new(:purple, 0, 75)
+#       ]
 
-      expect(p.order_colors_by_confidence(colors)).to match_array(sorted_colors)
-    end
-  end
+#       sorted_colors = [
+#         ColorConfidence.new(:purple, 0, 75),
+#         ColorConfidence.new(:black, 0, 50),
+#         ColorConfidence.new(:red, 1, 25)
+#       ]
 
-  describe '#color_confidence_to_color' do
-    it 'should take a list of ColorConfidences and map them to just their colors' do
-      p = Computer.new
+#       expect(p.order_colors_by_confidence(colors)).to match_array(sorted_colors)
+#     end
+#   end
 
-      color_confidences = [
-        ColorConfidence.new(:black, 0, 50),
-        ColorConfidence.new(:red, 1, 25),
-        ColorConfidence.new(:purple, 2, 75),
-        ColorConfidence.new(:yellow, 3, 75)
-      ]
+#   describe '#color_confidence_to_color' do
+#     it 'should take a list of ColorConfidences and map them to just their colors' do
+#       p = Computer.new
 
-      result = %i[black red purple yellow]
-      expect(p.color_confidence_to_color(color_confidences)).to eql(result)
-    end
-  end
+#       color_confidences = [
+#         ColorConfidence.new(:black, 0, 50),
+#         ColorConfidence.new(:red, 1, 25),
+#         ColorConfidence.new(:purple, 2, 75),
+#         ColorConfidence.new(:yellow, 3, 75)
+#       ]
 
-  describe '#build_guess_with_confident_colors' do
-    c = Computer.new
+#       result = %i[black red purple yellow]
+#       expect(p.color_confidence_to_color(color_confidences)).to eql(result)
+#     end
+#   end
 
-    it 'should should take an array of ColorConfidences and assign them correctly' do
-      color_confidences = [
-        ColorConfidence.new(:yellow, 3, 75),
-        ColorConfidence.new(:purple, 2, 75),
-        ColorConfidence.new(:black, 0, 50),
-        ColorConfidence.new(:red, 1, 25)
-      ]
+#   describe '#build_guess_with_confident_colors' do
+#     c = Computer.new
 
-      result = [
-        ColorConfidence.new(:black, 0, 50),
-        ColorConfidence.new(:red, 1, 25),
-        ColorConfidence.new(:purple, 2, 75),
-        ColorConfidence.new(:yellow, 3, 75)
-      ]
+#     it 'should should take an array of ColorConfidences and assign them correctly' do
+#       color_confidences = [
+#         ColorConfidence.new(:yellow, 3, 75),
+#         ColorConfidence.new(:purple, 2, 75),
+#         ColorConfidence.new(:black, 0, 50),
+#         ColorConfidence.new(:red, 1, 25)
+#       ]
 
-      expect(c.build_guess_with_confident_colors(color_confidences)).to match_array(result)
-    end
+#       result = [
+#         ColorConfidence.new(:black, 0, 50),
+#         ColorConfidence.new(:red, 1, 25),
+#         ColorConfidence.new(:purple, 2, 75),
+#         ColorConfidence.new(:yellow, 3, 75)
+#       ]
 
-    it 'should still build a guess with only one ColorConfidence' do
-      color_confidences = [ColorConfidence.new(:red, 3, 100)]
-      result = [nil, nil, nil, ColorConfidence.new(:red, 3, 100)]
-      expect(result.reject(&:nil?).length).to eql(1)
-      expect(c.build_guess_with_confident_colors(color_confidences)).to match_array(result)
-    end
-  end
+#       expect(c.build_guess_with_confident_colors(color_confidences)).to match_array(result)
+#     end
 
-  describe '#build_guess_with_unconfident_colors' do
-    c = Computer.new
+#     it 'should still build a guess with only one ColorConfidence' do
+#       color_confidences = [ColorConfidence.new(:red, 3, 100)]
+#       result = [nil, nil, nil, ColorConfidence.new(:red, 3, 100)]
+#       expect(result.reject(&:nil?).length).to eql(1)
+#       expect(c.build_guess_with_confident_colors(color_confidences)).to match_array(result)
+#     end
+#   end
 
-    it 'should take some less confident colors, and fill them in' do
-      color_confidences = [
-        ColorConfidence.new(:yellow, 2, 75),
-        ColorConfidence.new(:purple, 2, 75),
-        ColorConfidence.new(:black, 0, 50),
-        ColorConfidence.new(:red, 1, 25)
-      ]
+#   describe '#build_guess_with_unconfident_colors' do
+#     c = Computer.new
 
-      current_guess = c.build_guess_with_confident_colors(color_confidences)
+#     it 'should take some less confident colors, and fill them in' do
+#       color_confidences = [
+#         ColorConfidence.new(:yellow, 2, 75),
+#         ColorConfidence.new(:purple, 2, 75),
+#         ColorConfidence.new(:black, 0, 50),
+#         ColorConfidence.new(:red, 1, 25)
+#       ]
 
-      result = [
-        ColorConfidence.new(:black, 0, 50),
-        ColorConfidence.new(:red, 1, 25),
-        ColorConfidence.new(:yellow, 2, 75),
-        ColorConfidence.new(:purple, 2, 75)
-      ]
+#       current_guess = c.build_guess_with_confident_colors(color_confidences)
 
-      expect(current_guess).to be_a Array
-      expect(result).to be_a Array
-      expect(c.build_guess_with_unconfident_colors(color_confidences, current_guess)).to match_array(result)
-    end
-  end
+#       result = [
+#         ColorConfidence.new(:black, 0, 50),
+#         ColorConfidence.new(:red, 1, 25),
+#         ColorConfidence.new(:yellow, 2, 75),
+#         ColorConfidence.new(:purple, 2, 75)
+#       ]
+
+#       expect(current_guess).to be_a Array
+#       expect(result).to be_a Array
+#       expect(c.build_guess_with_unconfident_colors(color_confidences, current_guess)).to match_array(result)
+#     end
+#   end
 end
