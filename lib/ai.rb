@@ -32,19 +32,45 @@ module AI
     current_guess = Array.new(4)
     possible_colors = order_colors_by_confidence(possibilities)
 
+    puts possible_colors
     possible_colors.each do |possibility|
       next if possibility.impossible?
 
       current_guess[possibility.position] = possibility if current_guess[possibility.position].nil?
     end
 
-    # We never want to submit the same guess, so randomly change it
-    while previous_guesses.include?(current_guess)
-      random_substitution = possibilities.sample
-      current_guess[random_substitution.position] = random_substitution
+    if current_guess.any?(nil)
+      # start re-evaluating the ones we've deemed impossible
+      current_guess = current_guess.each_with_index.map do |g, i|
+        if g.nil?
+          possible_colors.select { |p| p.position == i }.sample
+        else
+          g
+        end
+      end
     end
 
-    puts current_guess
+
+    tries = 0
+    # We never want to submit the same guess, so swap our least confidence guess
+    while previous_guesses.include?(current_guess)
+
+      lowest_possibility = current_guess.min_by(&:confidence)
+      position_to_substitute = lowest_possibility.position
+
+      if tries > 4
+        position_to_substitute = (position_to_substitute + tries) % 4
+      end
+
+      next_best_guesses = possibilities.select do |p|
+        p.position == position_to_substitute
+      end
+
+      random_substitution = next_best_guesses.sample
+      current_guess[position_to_substitute] = random_substitution
+      tries += 1
+    end
+
     current_guess
   end
 
@@ -62,9 +88,10 @@ module AI
   def adjust_confidences(possibilities, last_guess, last_critique)
     # If there were no hits from the last critique, then they cannot possibly be included in the final code
     if last_critique.empty?
+      impossible_colors = last_guess.map(&:color)
       adjusted_possibilities = possibilities.map do |possibility|
-        possibility.make_impossible if last_guess.include?(possibility)
-
+        # This color is impossible if our last guess came back as empty
+        possibility.make_impossible if impossible_colors.include?(possibility.color)
         possibility
       end
     # If any of them were correct, then depending on how many there were, we can greatly increase our confidence
@@ -86,8 +113,10 @@ module AI
     elsif last_critique.include?(:misplaced)
       lowest_possibility = last_guess.min_by(&:confidence)
       adjusted_possibilities = possibilities.map do |possibility|
-        possibility.slightly_increase_confidence if last_guess.include?(possibility)
-        possibility.decrease_possibility if possibility == lowest_possibility
+        last_guess.each do |guess|
+          possibility.slightly_increase_confidence if guess.color == possibility.color && guess.position != possibility.position
+        end
+        #possibility.decrease_possibility if possibility == lowest_possibility
         possibility
       end
     end
