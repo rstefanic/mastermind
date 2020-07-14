@@ -15,7 +15,7 @@ class Possibility
   end
 
   def impossible?
-    @confidnece == IMPOSSIBLE
+    @confidence <= IMPOSSIBLE
   end
 
   def make_impossible
