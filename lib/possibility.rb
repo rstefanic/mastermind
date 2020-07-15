@@ -2,36 +2,39 @@ require './lib/colors.rb'
 
 class Possibility
   include Colors
-  attr_reader :color, :confidence, :position
+  attr_reader :color, :confidence, :position, :impossible
   HIGH = 75
   NEUTRAL = 50
   LOW = 25
-  IMPOSSIBLE = 0
+  IMPROBABLE = 0
 
   def initialize(color, position)
     @color = color
     @position = position
     @confidence = LOW
+    @impossible = false
   end
 
-  def impossible?
-    @confidence <= IMPOSSIBLE
+  def very_unlikely?
+    @confidence <= IMPROBABLE || @impossible
   end
 
   def make_impossible
-    @confidence = IMPOSSIBLE
+    @impossible = true
   end
 
+  # We want to check if it's been marked as impossible before increasing the confidence
+  # so that we're not increasing the confidence on colors that we know are impossible
   def slightly_increase_confidence
-    @confidence += 10
+    @confidence += 10 unless impossible
   end
 
   def greatly_increase_confidence
-    @confidence += LOW
+    @confidence += LOW unless impossible
   end
 
   def decrease_possibility
-    @confidence -= LOW
+    @confidence -= LOW unless impossible
   end
 
   def ==(other)
