@@ -3,7 +3,7 @@ require './lib/colors.rb'
 class Possibility
   include Colors
   attr_reader :color, :confidence, :position, :impossible
-  HIGH = 75
+  HIGH = 1000
   LOW = 25
   IMPROBABLE = 0
 
