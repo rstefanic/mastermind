@@ -4,7 +4,6 @@ class Possibility
   include Colors
   attr_reader :color, :confidence, :position, :impossible
   HIGH = 75
-  NEUTRAL = 50
   LOW = 25
   IMPROBABLE = 0
 
@@ -26,11 +25,11 @@ class Possibility
   # We want to check if it's been marked as impossible before increasing the confidence
   # so that we're not increasing the confidence on colors that we know are impossible
   def slightly_increase_confidence
-    @confidence += 10 unless impossible
+    @confidence += LOW unless impossible
   end
 
   def greatly_increase_confidence
-    @confidence += LOW unless impossible
+    @confidence += HIGH unless impossible
   end
 
   def decrease_possibility
@@ -44,6 +43,6 @@ class Possibility
   end
 
   def to_s
-    "#{color_string(@color)} [#{position}:#{confidence}]"
+    "#{color_string(@color)} [#{position}:#{impossible ? 'IMPOSSIBLE' : confidence}] "
   end
 end
