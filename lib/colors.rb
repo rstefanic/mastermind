@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 module Colors
-  COLORS = [:black, :red, :blue, :orange, :green, :yellow, :purple]
+  COLORS = %i[black red blue orange green yellow purple]
   BLANK = :blank
   SPACING = 10
 
